@@ -1,5 +1,8 @@
 (function(storyContent) {
 
+    let image_extend = 100;
+    let extra_long_extend = 900;
+
     // Create ink story from the content using inkjs
     var story = new inkjs.Story(storyContent);
 
@@ -7,6 +10,9 @@
 
     let savedTheme;
     let globalTagTheme;
+
+    var just_showed_an_image = false; 
+    var just_showed_extra_long = false; 
 
     // Global tags - those at the top of the ink file
     // We support:
@@ -102,6 +108,8 @@
 
                     showAfter(delay, imageElement);
                     delay += 200.0;
+
+                    just_showed_an_image = true;
                 }
 
                 // LINK: url
@@ -122,6 +130,11 @@
                 // CLASS: className
                 else if( splitTag && splitTag.property == "CLASS" ) {
                     customClasses.push(splitTag.val);
+                }
+
+                // EXTRALONG
+                else if( tag == "EXTRALONG" || tag == "LONG" ) {
+                    just_showed_extra_long = true;
                 }
 
                 // DARK: on, off, toggle
@@ -230,7 +243,18 @@
         // Extend height to fit
         // We do this manually so that removing elements and creating new ones doesn't
         // cause the height (and therefore scroll) to jump backwards temporarily.
-        storyContainer.style.height = contentBottomEdgeY()+"px";
+        let height_should_be = 0;
+        height_should_be = contentBottomEdgeY();
+        if (just_showed_an_image) {
+            height_should_be = height_should_be + image_extend;
+            just_showed_an_image = false;
+        }
+        if (just_showed_extra_long) {
+            height_should_be = height_should_be + extra_long_extend;
+            just_showed_extra_long = false;
+        }
+
+        storyContainer.style.height = height_should_be +"px";
 
         if( !firstTime )
             scrollDown(previousBottomEdge);
