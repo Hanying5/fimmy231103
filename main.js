@@ -1,7 +1,9 @@
 (function(storyContent) {
 
     let image_extend = 100;
-    let extra_long_extend = 900;
+    let extra_long_extend_default = 400;
+
+    let extra_long_extend = extra_long_extend_default;
 
     // Create ink story from the content using inkjs
     var story = new inkjs.Story(storyContent);
@@ -133,8 +135,13 @@
                 }
 
                 // EXTRALONG
-                else if( tag == "EXTRALONG" || tag == "LONG" ) {
+                else if( tag == "EXTRALONG" || tag == "LONG" || ( splitTag && splitTag.property == "EXTRALONG" ) || ( splitTag && splitTag.property == "LONG" )) {
                     just_showed_extra_long = true;
+                    if (splitTag) {
+                        extra_long_extend = parseInt(splitTag.val.trim());
+                    } else {
+                        extra_long_extend = extra_long_extend_default;
+                    }
                 }
 
                 // DARK: on, off, toggle
